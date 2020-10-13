@@ -30,8 +30,10 @@ import (
 )
 
 const (
-	loginUrl = "/api/management/v1/useradm/auth/login"
-	timeout  = 10 * time.Second
+	loginURLMender = "/api/management/v1/useradm/auth/login"
+	loginURLGoogle = "api/management/v1/useradm/oauth2/github"
+	loginURLGithub = "api/management/v1/useradm/oauth2/google"
+	timeout        = 10 * time.Second
 )
 
 type Client struct {
@@ -40,14 +42,22 @@ type Client struct {
 	client   *http.Client
 }
 
-func NewClient(url string, skipVerify bool) *Client {
+func NewClient(url string, skipVerify bool, loginType string) *Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipVerify},
 	}
 
+	var loginURL = loginURLMender
+
+	if loginType == "github" {
+		loginURL = loginURLGoogle
+	} else if loginType == "google" {
+		loginURL = loginURLGithub
+	}
+
 	return &Client{
 		url:      url,
-		loginUrl: JoinURL(url, loginUrl),
+		loginUrl: JoinURL(url, loginURL),
 		client: &http.Client{
 			Transport: tr,
 		},

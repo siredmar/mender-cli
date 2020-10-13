@@ -73,12 +73,20 @@ type LoginCmd struct {
 	password   string
 	token      string
 	tokenPath  string
+	loginType  string
 }
 
 func NewLoginCmd(cmd *cobra.Command, args []string) (*LoginCmd, error) {
 	viper.BindPFlag(argRootServer, cmd.Flags().Lookup(argRootServer))
 	viper.BindPFlag(argLoginUsername, cmd.Flags().Lookup(argLoginUsername))
 	viper.BindPFlag(argLoginPassword, cmd.Flags().Lookup(argLoginPassword))
+	viper.BindPFlag(argRootLoginType, cmd.Flags().Lookup(argRootLoginType))
+
+	loginType := viper.GetString(argRootLoginType)
+	if loginType == "" {
+		return nil, errors.New("No login type, set either 'mender', 'github' or 'google'")
+	}
+
 	server := viper.GetString(argRootServer)
 	if server == "" {
 		return nil, errors.New("No server, this should not happen")
@@ -120,6 +128,7 @@ func NewLoginCmd(cmd *cobra.Command, args []string) (*LoginCmd, error) {
 		token:      tfaToken,
 		tokenPath:  token,
 		skipVerify: skipVerify,
+		loginType:  loginType,
 	}, nil
 }
 
@@ -129,7 +138,7 @@ func (c *LoginCmd) Run() error {
 		return err
 	}
 
-	client := useradm.NewClient(c.server, c.skipVerify)
+	client := useradm.NewClient(c.server, c.skipVerify, c.loginType)
 	res, err := client.Login(c.username, c.password, c.token)
 	if err != nil {
 		return err

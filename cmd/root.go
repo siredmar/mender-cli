@@ -28,6 +28,7 @@ const (
 	argRootToken      = "token"
 	argRootVerbose    = "verbose"
 	argRootGenerate   = "generate-autocomplete"
+	argRootLoginType  = "logintype"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -69,6 +70,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP(argRootSkipVerify, "k", false, "skip SSL certificate verification")
 	rootCmd.PersistentFlags().StringP(argRootToken, "", "", "token file path")
 	rootCmd.PersistentFlags().BoolP(argRootVerbose, "v", false, "print verbose output")
+	rootCmd.PersistentFlags().StringP(argRootLoginType, "l", "mender", "login type: 'mender', 'github', 'google'")
 	rootCmd.Flags().Bool(argRootGenerate, false, "generate shell completion script")
 	rootCmd.Flags().MarkHidden(argRootGenerate)
 	rootCmd.AddCommand(loginCmd)
